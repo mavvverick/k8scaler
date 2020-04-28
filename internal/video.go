@@ -57,7 +57,7 @@ func Process(kube KubernetesClient, msg []byte) error {
 }
 
 // SaveToDB inserts kafka records into mysql
-func SaveToDB(msg []byte) error {
+func SaveToDB(msg []byte, t time.Time) error {
 	db, err := ConnectSQL()
 	if err != nil {
 		return err
@@ -75,7 +75,7 @@ func SaveToDB(msg []byte) error {
 		Type:      "x264",
 		Size:      "540x960",
 		Cost:      1000,
-		CreatedAt: time.Now().Format("2006-01-02"),
+		CreatedAt: t.Format("2006-01-02"),
 	}
 	//insert row for 540p videos
 	db.Create(&dbRecord)

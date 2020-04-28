@@ -42,7 +42,7 @@ func ListenKafka(kube KubernetesClient) {
 			fmt.Println(err)
 		}
 		//fmt.Printf("message at topic:%v partition:%v offset:%v	%s = %s\n", m.Topic, m.Partition, m.Offset, string(m.Key), string(m.Value))
-		err = SaveToDB(m.Value)
+		err = SaveToDB(m.Value, m.Time)
 		if err != nil {
 			fmt.Println(err)
 		}
