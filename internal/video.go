@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"math"
+	"time"
 )
 
 type Message struct {
@@ -14,6 +15,14 @@ type Message struct {
 	Cancelled  int64 `json:"Cancelled"`
 	Terminated int64 `json:"Terminated"`
 	Total      int64 `json:"Total"`
+}
+
+type jobInfo struct {
+	Count     int64
+	Type      string
+	Size      string
+	Cost      int64
+	CreatedAt string
 }
 
 var minThreshold = int64(2)
@@ -43,6 +52,37 @@ func Process(kube KubernetesClient, msg []byte) error {
 			return err
 		}
 	}
+
+	return nil
+}
+
+// SaveToDB inserts kafka records into mysql
+func SaveToDB(msg []byte) error {
+	db, err := ConnectSQL()
+	if err != nil {
+		return err
+	}
+	defer db.Close()
+	fmt.Println("established db connection")
+
+	var m Message
+	if err := json.Unmarshal(msg, &m); err != nil {
+		return err
+	}
+
+	dbRecord := jobInfo{
+		Count:     m.Completed,
+		Type:      "x264",
+		Size:      "540x960",
+		Cost:      1000,
+		CreatedAt: time.Now().Format("2006-01-02"),
+	}
+	//insert row for 540p videos
+	db.Create(&dbRecord)
+	// insert row for 240p videos
+	dbRecord.Size = "240x352"
+	dbRecord.Cost = 400
+	db.Create(&dbRecord)
 
 	return nil
 }

@@ -5,6 +5,8 @@ go 1.13
 require (
 	github.com/ericchiang/k8s v1.2.0
 	github.com/ghodss/yaml v0.0.0-20150909031657-73d445a93680
+	github.com/go-sql-driver/mysql v1.4.1
+	github.com/jinzhu/gorm v1.9.12
 	github.com/joho/godotenv v1.3.0
 	github.com/rs/zerolog v1.18.0
 	github.com/segmentio/kafka-go v0.3.5
