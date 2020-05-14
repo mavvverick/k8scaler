@@ -16,9 +16,9 @@ import (
 )
 
 func ListenKafka(kube KubernetesClient) {
-	kafkaURL := os.Getenv("kafkaURL")
-	topic := os.Getenv("topic")
-	groupID := os.Getenv("groupID")
+	kafkaURL := os.Getenv("KAFKA_BROKERS")
+	topic := os.Getenv("KAFKA_TOPIC")
+	groupID := os.Getenv("KAFKA_GROUPID")
 	reader := getKafkaReader(kafkaURL, topic, groupID)
 	defer reader.Close()
 	fmt.Println("start consuming ... !!")
@@ -47,15 +47,18 @@ func ListenKafka(kube KubernetesClient) {
 
 func getKafkaReader(kafkaURL, topic, groupID string) *kafka.Reader {
 	brokers := strings.Split(kafkaURL, ",")
-	mechanism, _ := scram.Mechanism(scram.SHA256, os.Getenv("username"), os.Getenv("pass"))
 	dialer := &kafka.Dialer{
-		Timeout:       10 * time.Second,
-		SASLMechanism: mechanism,
-		DualStack:     true,
-		TLS: &tls.Config{
-			InsecureSkipVerify: true,
-		},
+		Timeout: 10 * time.Second,
 	}
+	if os.Getenv("KAFKA_USERNAME") != "" {
+		mechanism, _ := scram.Mechanism(scram.SHA256, os.Getenv("KAFKA_USERNAME"), os.Getenv("KAFKA_PASS"))
+		dialer.SASLMechanism = mechanism
+		dialer.DualStack = true
+		dialer.TLS = &tls.Config{
+			InsecureSkipVerify: true,
+		}
+	}
+
 	readerConfig := kafka.ReaderConfig{
 		Brokers:  brokers,
 		GroupID:  groupID,

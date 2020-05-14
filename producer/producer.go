@@ -19,7 +19,7 @@ import (
 
 func getKafkaWriter(kafkaURL, topic, groupID string) *kafka.Writer {
 	brokers := strings.Split(kafkaURL, ",")
-	mechanism, _ := scram.Mechanism(scram.SHA256, os.Getenv("username"), os.Getenv("pass"))
+	mechanism, _ := scram.Mechanism(scram.SHA256, os.Getenv("KAFKA_USERNAME"), os.Getenv("KAFKA_PASS"))
 	dialer := &kafka.Dialer{
 		Timeout:       10 * time.Second,
 		SASLMechanism: mechanism,
@@ -39,9 +39,9 @@ func getKafkaWriter(kafkaURL, topic, groupID string) *kafka.Writer {
 
 func main() {
 	// to produce messages
-	kafkaURL := os.Getenv("kafkaURL")
-	topic := os.Getenv("topic")
-	groupID := os.Getenv("groupID")
+	kafkaURL := os.Getenv("KAFKA_BROKERS")
+	topic := os.Getenv("KAFKA_TOPIC")
+	groupID := os.Getenv("KAFKA_GROUPID")
 
 	signals := make(chan os.Signal, 1)
 	signal.Notify(signals, syscall.SIGINT, syscall.SIGKILL)
